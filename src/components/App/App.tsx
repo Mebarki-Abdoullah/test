@@ -1,26 +1,53 @@
-import logo from '../../assets/logo.svg';
-
+import { useEffect, useState } from 'react';
+import data from '../../data/post';
 import './App.scss';
+import axios from 'axios';
+import Post from '../map';
 
 function App() {
+  const [text, settext] = useState('ecrivez dans la barre de recherche');
+  const [color, setcolor] = useState(false);
+  const [api, setapi] = useState([]);
+
+  const fetchApi = async () => {
+    try {
+      const response = await axios.get(
+        'https://oblog-react.vercel.app/api/posts'
+      );
+
+      setapi(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchApi();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+    <div className={color ? 'dark' : 'red'}>
+      <h1>{text}</h1>
+      <input
+        type="text"
+        placeholder="test"
+        onChange={(e) => settext(e.target.value)}
+      />
 
-        <p>
-          Edit <code>src/components/App/App.tsx</code> and save to reload.
-        </p>
+      <div>
+        {api?.map((e) => (
+          <Post key={e.id} post={e} />
+        ))}
+      </div>
 
-        <a
-          className="App-link"
-          href="https://react.dev/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div>
+        <button type="button" onClick={() => setcolor((prev) => true)}>
+          dark mode
+        </button>
+        <button type="button" onClick={() => setcolor((prev) => false)}>
+          red mode
+        </button>
+      </div>
     </div>
   );
 }
